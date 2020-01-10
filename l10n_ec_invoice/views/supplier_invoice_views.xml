@@ -221,16 +221,23 @@
           </group>
         </xpath>
 
-
         <!-- VARIABLES UBICADAS EN edocument_invoice_views:  -->
         <xpath expr="//field[@name='doc_electronico_no_autorizacion']" position="after">
-            <field name="estado" readonly="0" invisible="1"/>
-            <field name="estado_lc" readonly="0" invisible="1"/>
-
+            <field name="estado" readonly="0" invisible="1"
+                   decoration-danger="estado=='00'"
+                   decoration-info="estado=='01'"
+                   decoration-warning="estado=='02'"
+                   decoration-muted="estado=='03'"
+            />
+            <field name="estado_lc" readonly="0" invisible="1"
+                   decoration-danger="estado=='00'"
+                   decoration-info="estado=='01'"
+                   decoration-warning="estado=='02'"
+                   decoration-muted="estado=='03'"
+            />
             <field name="bool_on_off_estado" invisible="1"/>
             <field name="bool_on_off_estado_lc" invisible="1"/>
         </xpath>
-
 
         <!-- SEMAFOROS DE CONTROL -->
         <xpath expr="//field[@name='codigo_sustento']" position="after">
