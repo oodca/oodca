@@ -222,6 +222,29 @@
         </xpath>
 
 
+        <!-- VARIABLES UBICADAS EN edocument_invoice_views:  -->
+        <!-- PESTAÑA HISTORIAL DE CONEXIONES AL SRI -->
+        <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+            <page string="Historial">
+                <group>
+                    <field name="historial"
+                           readonly="1"
+                           decoration-danger="estado=='00'"
+                           decoration-info="estado=='01'"
+                           decoration-warning="estado=='02'"
+                           decoration-muted="estado=='03'"
+                    />
+                    <field name="bool_on_off_estado_lc"
+                           attrs="{
+                           'invisible': [
+                           ('tipo_comprobante', '!=', '03'),
+                           ]}"/>
+                    <field name="bool_on_off_estado"/>
+                </group>
+            </page>
+        </xpath>
+
+
         <!-- SEMAFOROS DE CONTROL -->
         <xpath expr="//field[@name='codigo_sustento']" position="after">
           <field name="bool_doc_enviado" string="CRF Enviado" readonly="1" invisible="1" force_save="1"/>
