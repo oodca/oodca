@@ -179,48 +179,15 @@
           </group>
         </xpath>
 
-        
+
         <!-- VARIABLES UBICADAS EN edocument_invoice_views:  -->
-        <!-- ESTADO DE ENVIO DEL COMPROBANTE ELECTRONICO:  -->
         <xpath expr="//field[@name='doc_electronico_no_autorizacion']" position="after">
-            <field name="estado"
-                   force_save="1"
-                   decoration-danger="estado=='00'"
-                   decoration-info="estado=='01'"
-                   decoration-warning="estado=='02'"
-                   decoration-muted="estado=='03'"
-                   readonly="0"
-                   attrs="{
-                   'readonly':[
-                    ('bool_on_off_estado', '=', False)],
-                    'invisible': [
-                    '|',
-                    ('state', '=', 'draft'),
-                    ('tipo_documento_tributario', '=', 'COMPROBANTE DE RETENCION DE VENTA'),
-                    ]}"
-            />
-            <field name="estado_lc" force_save="1" invisible="1"/>
+            <field name="estado" readonly="0" invisible="1"/>
+            <field name="estado_lc" readonly="0" invisible="1"/>
+            
+            <field name="bool_on_off_estado" invisible="1"/>
+            <field name="bool_on_off_estado_lc" invisible="1"/>
         </xpath>
-        <!-- PESTAÑA HISTORIAL DE CONEXIONES AL SRI -->
-        <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
-            <page string="Historial">
-                <group>
-                    <field name="historial"
-                           readonly="1"
-                           decoration-danger="estado=='00'"
-                           decoration-info="estado=='01'"
-                           decoration-warning="estado=='02'"
-                           decoration-muted="estado=='03'"
-                    />
-                    <field name="bool_on_off_estado"/>
-                    <field name="bool_on_off_estado_lc" invisible="1"/>
-                </group>
-            </page>
-        </xpath>
-
-
-
-
 
         <!-- SEMAFOROS DE CONTROL -->
         <xpath expr="//field[@name='user_id']" position="after">
