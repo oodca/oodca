@@ -223,6 +223,25 @@
 
 
         <!-- VARIABLES UBICADAS EN edocument_invoice_views:  -->
+        <!-- ESTADO DE ENVIO DEL COMPROBANTE ELECTRONICO:  -->
+        <xpath expr="//field[@name='doc_electronico_no_autorizacion']" position="after">
+            <field name="estado"
+                   string="Estado SRI"
+                   force_save="1"
+                   decoration-danger="estado=='00'"
+                   decoration-info="estado=='01'"
+                   decoration-warning="estado=='02'"
+                   decoration-muted="estado=='03'"
+                   readonly="0"
+                   attrs="{
+                   'readonly':[
+                    ('bool_on_off_estado', '=', False)],
+                    'invisible': [
+                    '|',
+                    ('state', '=', 'draft')]
+                    }"
+            />
+        </xpath>
         <!-- PESTAÑA HISTORIAL DE CONEXIONES AL SRI -->
         <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
             <page string="Historial">
