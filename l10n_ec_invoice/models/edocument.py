@@ -1107,6 +1107,20 @@ class AccountInvoice(models.Model):
                         logging.info(log_msg)
                         self.history_log(log_msg)
 
+                        # --------------------------------------------------------------------------------
+                        # MESSAGE_BOX CODE: USAR SOLO PARA MENSAJES INFORMATIVOS QUE NO DETENGAN PROCESOS
+                        # --------------------------------------------------------------------------------
+                        title = "RE-ENVIO DE CORREO ELECTRONICO LC & CR:"
+                        message = 'CORREOS ELECTRONICOS RE-ENVIADOS CON EXITO A: ' \
+                                  + self.partner_id.email + ' PERTENECIENTE A:  ' + self.partner_id.name
+                        view = self.env.ref('l10n_ec_invoice.message_box_form')
+                        # view_id = view and view.id or False
+                        context = dict(self._context or {})
+                        context['message'] = message
+                        return {'name': title, 'type': 'ir.actions.act_window', 'res_model': 'message_box',
+                                'view_mode': 'form',
+                                'view_type': 'form', 'view_id': view.id, 'target': 'new', 'context': context, }
+
                 # ------------------------------------------------------
                 # SI EL DOCUMENTO NO ES UNA LIQUIDACION DE COMPRA
                 # ------------------------------------------------------
@@ -1115,7 +1129,7 @@ class AccountInvoice(models.Model):
                     # ENVIA CORREO DEL COMPROBANTE ELECTRONICO: CR, FV, NC, GR
                     # ---------------------------------------------------------
                     adjuntos_ids = self.env['ir.attachment'].search([('name', 'like', self.doc_electronico_no_autorizacion)])
-                    if adjuntos_ids and self.message_attachment_count == 2:
+                    if adjuntos_ids and (self.message_attachment_count == 2 or self.message_attachment_count == 4):
                         self.send_document(
                             attachments=[a.ids for a in adjuntos_ids],
                             template='l10n_ec_invoice.email_template_invoice'
@@ -1137,6 +1151,7 @@ class AccountInvoice(models.Model):
                         return {'name': title, 'type': 'ir.actions.act_window', 'res_model': 'message_box',
                                 'view_mode': 'form',
                                 'view_type': 'form', 'view_id': view.id, 'target': 'new', 'context': context, }
+
                     else:
                         log_msg = 'NO SE ENVIO EL CORREO A ' + self.partner_id.name + '. NUMERO DE ARCHIVOS ADJUNTOS ERRONEO. '
                         logging.info(log_msg)
