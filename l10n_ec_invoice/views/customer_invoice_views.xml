@@ -35,6 +35,25 @@
       <field name="model">account.invoice</field>
       <field name="inherit_id" ref="account.invoice_form"/>
       <field name="arch" type="xml">
+
+        <!-- PESTAÑA HISTORIAL DE CONEXIONES AL SRI -->
+        <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+            <page string="Historial">
+                <group>
+                    <field name="historial"
+                           readonly="1"
+                           decoration-danger="estado=='00'"
+                           decoration-info="estado=='01'"
+                           decoration-warning="estado=='02'"
+                           decoration-muted="estado=='03'"
+                    />
+                    <field name="bool_on_off_estado"/>
+                    <field name="bool_on_off_estado_lc" invisible="1"/>
+                </group>
+            </page>
+        </xpath>
+
+
         <!-- INVISIBLE: BOTON action_invoice_sent DENTRO DEL ENCABEZADO DE LA FACTURA -->
         <xpath expr="//header/button[@name='action_invoice_sent']" position="attributes">
             <attribute name="invisible">1</attribute>
