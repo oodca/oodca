@@ -10,6 +10,7 @@
                 <xpath expr="//field[@name='state']" position="after">
                     <field name="estado" invisible="1"/>
                     <field name="doc_electronico_fecha_autorizacion" invisible="1"/>
+                    <field name="tipo_documento_tributario" invisible="1"/>
                     <!-- BOTTON procesar_individual -->
                     <button name="procesar_individual"
                             type="object"
@@ -62,6 +63,7 @@
                     <field name="bool_doc_enviado" invisible="1"/>
                     <field name="doc_electronico_fecha_autorizacion" invisible="1"/>
                     <field name="numero_autorizacion" invisible="1"/>
+                    <field name="tipo_documento_tributario" invisible="1"/>
                     <!-- BOTTON procesar_individual -->
                     <button name="procesar_individual"
                             type="object"
