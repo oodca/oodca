@@ -720,6 +720,13 @@ class ResPartner(models.Model):
         # noinspection PyAttributeOutsideInit
         self.barcode = self.numero_identidad
 
+        utc_now = datetime.today()
+        pst_now = utc_now.astimezone(pytz.timezone("America/Guayaquil"))
+        pst_now_str = pst_now.strftime("%Y-%m-%d")
+        # pst_now_obj = datetime.strptime(pst_now_str, '%Y-%m-%d').date()
+
+        self.update_date = pst_now_str
+
         return retorno
 
     # --------------------------------------------------------------
