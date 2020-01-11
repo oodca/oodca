@@ -160,7 +160,7 @@
                    ]}">
               <field name="doc_electronico_no" force_save="1" readonly="1"/>
               <field name="doc_electronico_fecha" force_save="1" readonly="1" invisible="1"/>
-              <field name="doc_electronico_no_autorizacion" force_save="0" readonly="1"/>
+              <field name="doc_electronico_no_autorizacion" force_save="0" readonly="1" style="font-size:95%;"/>
               <field name="amount_total" invisible="1" />
               <field name="doc_electronico_xml" force_save="1" readonly="1" invisible="1"/>
               <field name="doc_electronico_no_anulacion" force_save="1" readonly="0"
@@ -174,7 +174,7 @@
                      ('bool_onOff_no_anulacion','=',True)
                      ]}"/>
               <field name="doc_electronico_tipo" readonly="1" force_save="1" invisible="1"/>
-              <field name="doc_electronico_fecha_autorizacion" invisible = "0" style="font-size:100%;" force_save="1"/>
+              <field name="doc_electronico_fecha_autorizacion" invisible = "0" force_save="1"/>
             </group>
           </group>
         </xpath>
