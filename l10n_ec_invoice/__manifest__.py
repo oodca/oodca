@@ -45,6 +45,7 @@ Desarrollado por: **José Ernesto Enríquez Jurado**
         'views/edocument_invoice_views.xml',
         'views/edocument_email_template.xml',
         'views/edocument_email_lc_template.xml',
+        'views/product.xml',
         'reports/report.xml',
         'reports/report_retention.xml',
         'reports/report_out_invoice.xml',

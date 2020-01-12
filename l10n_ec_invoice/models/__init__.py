@@ -6,4 +6,6 @@ from . import retencion
 from . import factura
 from . import notaCredito
 from . import liquidacionCompra
+
 from . import ir_actions_report
+from . import product
