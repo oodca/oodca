@@ -578,8 +578,7 @@ class AccountInvoice(models.Model):
                     # SI validador_recepcion == False --> EL SRI EMITIÓ UN ERROR EN LA VALIDACION DEL COMPROBANTE ELECTRONICO
                     # --------------------------------------------------------------------------------------------------------
                     # if codigo_error != '70' and codigo_error != '43':
-                    if int(codigo_error) in [2, 10, 26, 27, 28, 35, 36, 37, 39, 40, 45, 46,
-                                             47, 48, 49, 50, 52, 56, 57, 58, 63, 65, 67, 80]:
+                    if int(codigo_error) in [26, 28, 35, 36, 45, 47, 48, 49, 50, 65, 67]:
                         # -----------------------------------------------------------------------------------
                         # CODIGOS DE ERRORES DE WS validarComprobante QUE DETIENEN EL PROCESO DE FACTURACION
                         # ESTOS DOCUMENTOS DEBEN REVISARSE Y ANULARSE EN EL SISTEMA. PUEDE QUE REQUIERAN
