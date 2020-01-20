@@ -14,6 +14,8 @@ except ImportError:
     # noinspection PyUnresolvedReferences,PyUnboundLocalVariable
     logging.getLogger('xades.sri').info('Instalar librerias suds-jurko')
 
+from jinja2 import Environment, FileSystemLoader
+
 import requests
 import os
 from io import StringIO
@@ -162,7 +164,6 @@ class DocumentXML(object):
                 messages = []
                 client = Client(url_recept)
                 result = client.service.autorizacionComprobante(access_key)
-
                 if result.numeroComprobantes == '0':
                     self.logger.info('SRI: LA CLAVE DE ACCESO: ' + access_key + ' NO TIENE COMPROBANTES REGISTRADOS')
                     messages = "SIN INFORMACION"
@@ -183,6 +184,21 @@ class DocumentXML(object):
 
             except requests.exceptions.RequestException:
                 sleep(3)
+
+    @staticmethod
+    def render_authorized_document(autorizacion):
+        tmpl_path = os.path.join(os.path.dirname(__file__), 'templates')
+        env = Environment(loader=FileSystemLoader(tmpl_path))
+        edocument_tmpl = env.get_template('authorized_withdrawing.xml')
+        auth_xml = {
+            'estado': autorizacion.estado,
+            'numeroAutorizacion': autorizacion.numeroAutorizacion,
+            'ambiente': autorizacion.ambiente,
+            'fechaAutorizacion': str(autorizacion.fechaAutorizacion.strftime("%d/%m/%Y %H:%M:%S")),  # noqa
+            'comprobante': autorizacion.comprobante
+        }
+        auth_withdrawing = edocument_tmpl.render(auth_xml)
+        return auth_withdrawing
 
 
 class SriService(object):

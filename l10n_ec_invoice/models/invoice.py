@@ -297,6 +297,12 @@ class AccountInvoice(models.Model):
         copy=False,
         help='Se prende o apaga a necesidad de las condiciones del botón'
     )
+    bool_activo_no_corriente = fields.Boolean(
+        string='Activo No Corriente',
+        default=False,
+        copy=False,
+        help='Se prende o apaga a necesidad de las condiciones del botón'
+    )
     # ----------------------------------
     # MODIFICACION DE CAMPOS EXISTENTES
     # ----------------------------------
@@ -347,12 +353,18 @@ class AccountInvoice(models.Model):
     @api.multi
     def action_invoice_open(self):
         # ---------------------------------------------------------------------------
+        # TODO: UTILIZACION DE CODIGO ODOO - INJERTO DE CODIGO
+        # ---------------------------------------------------------------------------
+        # ---------------------------------------------------------------------------
         # AL VALIDAR UN FORMULARIO DE LA CLASE AccountInvoice, ANTES QUE NADA
         # SE ACTUALIZA EL NO DE REFERENCIA self.reference PARA doc_electronico_tipo:
         # FACTURA
         # NOTA DE CREDITO
         # LIQUIDACION DE COMPRA
         # ---------------------------------------------------------------------------
+        # ------------------------------------------------------------------------
+        # FIXME: INICIA EL INJERTO
+        # ------------------------------------------------------------------------
         formulario_sequence_number_next = {}
 
         if not self.bool_on_off_estado:
@@ -378,6 +390,9 @@ class AccountInvoice(models.Model):
 
                 referencia = establecimiento + "-" + punto_emision + "-" + numero_secuencial
                 self.reference = referencia
+        # ------------------------------------------------------------------------
+        # FIXME: TERMINA EL INJERTO
+        # ------------------------------------------------------------------------
         # ---------------------------------------------------------------------------
         # SE MANTIENE LA ESTRUCTURA DEL PROGRAMA DE ODOO:
         # tipo:     @api.multi
@@ -966,6 +981,7 @@ class AccountInvoice(models.Model):
             # ------------------------------------------------------------------
             reference_description = ""
             self.propina = 0.00
+            self.bool_activo_no_corriente = False
             for line in self.mapped('invoice_line_ids'):
                 # ---------------------------------------------------------------
                 # DEFINE LA INFORMACION DEL Reference/Description DEL FORMULARIO
@@ -976,6 +992,10 @@ class AccountInvoice(models.Model):
                     bloque_2 = bloque_1.split("]")[0]
                     bloque_extraido = "[" + bloque_2 + "]"
                     line.name = name.replace(bloque_extraido, "")
+
+                if line.account_id.user_type_id.id == 6:
+                    self.bool_activo_no_corriente = True
+
                 reference_description = reference_description + "/" + line.name
                 # ---------------------------------------------------------------
                 # CALCULA LAS PROPINAS
@@ -1790,10 +1810,16 @@ class AccountInvoice(models.Model):
     # ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
     @api.multi
     def name_get(self):
+        # ---------------------------------------------------------------------------
+        # TODO: UTILIZACION DE CODIGO ODOO - INJERTO DE CODIGO
+        # ---------------------------------------------------------------------------
         # ------------------------------------------------------------
         # CAMBIA LA PRESENTACION EN PANTALLA DE LOS SIGUIENTES CAMPOS
         # select_numDiarioModificado_ventas
         # ------------------------------------------------------------
+        # ---------------------------------------------------------------------------
+        # FIXME: INICIA EL INJERTO
+        # ---------------------------------------------------------------------------
         result = []
         cadena = {}
         for record in self:
@@ -1802,7 +1828,9 @@ class AccountInvoice(models.Model):
                          str('${:0,.2f}'.format(record.amount_untaxed))
             result.append((record.id, cadena))
         return result
-
+        # ------------------------------------------------------------------------
+        # FIXME: TERMINA EL INJERTO
+        # ------------------------------------------------------------------------
     # ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
     # –––––––––––––––––––––––––––––––––––––––––––––––––––––– @api ––––––––––––––––––––––––––––––––––––––––––––––––––––––
     # ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
@@ -2109,93 +2137,95 @@ class AccountInvoiceRefund(models.TransientModel):
                 estado = formulario.estado
                 doc_electronico_fecha_autorizacion = formulario.doc_electronico_fecha_autorizacion
 
-            while numero <= 2:
-                if estado != '04' or doc_electronico_fecha_autorizacion is not False:
-                    ruta_archivo_xml = formulario.company_id.company_ruta_documentos
-                    if numero == 1:
-                        nombre_archivo_xml = ruta_archivo_xml + formulario.doc_electronico_xml_lc
-                        doc_electronico_no_autorizacion = formulario.doc_electronico_no_autorizacion_lc
-                        tipo_comprobante_descripcion = 'LIQUIDACION DE COMPRA'
-                    else:
-                        nombre_archivo_xml = ruta_archivo_xml + formulario.doc_electronico_xml
-                        doc_electronico_no_autorizacion = formulario.doc_electronico_no_autorizacion
-                        tipo_comprobante_descripcion = 'COMPROBANTE DE RETENCION'
+            if doc_electronico_fecha_autorizacion:
 
-                    # nombre_archivo_xml = ruta_archivo_xml + formulario.doc_electronico_xml + 'R'
-
-                    # ----------------------------------------------------------------------
-                    # RECUPERA DEL DISCO EL ARCHIVO XML EN FORMATO TEXTO archivo_basico_xml
-                    # ----------------------------------------------------------------------
-                    archivo_basico = open(nombre_archivo_xml, "r", encoding='utf8')
-                    archivo_basico_xml = archivo_basico.read()
-
-                    # ----------------------------------------------------------------------
-                    # CAMBIA LOS CARACTERES ESPECIALES Y CREA archivo_basico_fix_xml
-                    # ----------------------------------------------------------------------
-                    archivo_basico_fix_xml = self.replace_fix_chars(archivo_basico_xml)
-
-                    # ------------------------------------------------------------------------------------------------------
-                    # SRI: CARGA EL ESQUEMA PARA EL TIPO DE DOCUMENTO ELECTRONICO Y
-                    # VALIDA EL ARCHIVO archivo_basico_fix_xml EN EL FORMATO XML
-                    # --------------------------------------------------------------
-                    # -------------------------------------------------
-                    # DEFINE inv_xml EN FUNCION DEL ESQUEMA ESPECIFICO
-                    # -------------------------------------------------
-                    inv_xml = {}
-
-                    if formulario.tipo_documento_tributario == 'DOCUMENTO DE COMPRA':
+                while numero <= 2:
+                    if estado != '04' or doc_electronico_fecha_autorizacion is not False:
+                        ruta_archivo_xml = formulario.company_id.company_ruta_documentos
                         if numero == 1:
-                            inv_xml = DocumentXML(archivo_basico_fix_xml, 'purchase_clearance')
+                            nombre_archivo_xml = ruta_archivo_xml + formulario.doc_electronico_xml_lc
+                            doc_electronico_no_autorizacion = formulario.doc_electronico_no_autorizacion_lc
+                            tipo_comprobante_descripcion = 'LIQUIDACION DE COMPRA'
                         else:
-                            inv_xml = DocumentXML(archivo_basico_fix_xml, 'withdrawing')
-                    if formulario.tipo_documento_tributario == 'FACTURA DE VENTA':
-                        inv_xml = DocumentXML(archivo_basico_fix_xml, 'out_invoice')
-                    if formulario.tipo_documento_tributario == 'NOTA DE CREDITO DE VENTA':
-                        inv_xml = DocumentXML(archivo_basico_fix_xml, 'out_refund')
-                    if formulario.tipo_documento_tributario == 'GUIA DE REMISION':
-                        inv_xml = DocumentXML(archivo_basico_fix_xml, 'delivery')
+                            nombre_archivo_xml = ruta_archivo_xml + formulario.doc_electronico_xml
+                            doc_electronico_no_autorizacion = formulario.doc_electronico_no_autorizacion
+                            tipo_comprobante_descripcion = 'COMPROBANTE DE RETENCION'
 
-                    # ---------------------------
-                    # SRI AUTORIZACION SOLICITUD
-                    # ---------------------------
-                    # --------------------------------
-                    # SOLICITA LA AUTORIZACION AL SRI
-                    # --------------------------------
+                        # nombre_archivo_xml = ruta_archivo_xml + formulario.doc_electronico_xml + 'R'
 
-                    # noinspection PyProtectedMember
-                    url_recepcion, url_autorizacion = formulario.company_id._get_ws()
+                        # ----------------------------------------------------------------------
+                        # RECUPERA DEL DISCO EL ARCHIVO XML EN FORMATO TEXTO archivo_basico_xml
+                        # ----------------------------------------------------------------------
+                        archivo_basico = open(nombre_archivo_xml, "r", encoding='utf8')
+                        archivo_basico_xml = archivo_basico.read()
 
-                    autorizacion, mensaje_autorizacion = inv_xml.request_authorization(doc_electronico_no_autorizacion, url_autorizacion)
+                        # ----------------------------------------------------------------------
+                        # CAMBIA LOS CARACTERES ESPECIALES Y CREA archivo_basico_fix_xml
+                        # ----------------------------------------------------------------------
+                        archivo_basico_fix_xml = self.replace_fix_chars(archivo_basico_xml)
 
-                    if autorizacion is not False and mensaje_autorizacion is False:
-                        # --------------------------------------------------------------------------------
-                        # MESSAGE_BOX CODE: USAR SOLO PARA MENSAJES INFORMATIVOS QUE NO DETENGAN PROCESOS
-                        # --------------------------------------------------------------------------------
-                        title = "MENSAJE INFORMATIVO:"
-                        message = 'El comprobante electrónico ' + \
-                                  tipo_comprobante_descripcion + \
-                                  ' No ' + \
-                                  str(formulario.reference) + \
-                                  ', con Clave de Acceso ' + \
-                                  str(doc_electronico_no_autorizacion) + \
-                                  ', se  encuentra ACTIVO y VIGENTE en el SRI. ANULE este comprobante a través del ' + \
-                                  'portal de internet [SRI EN LINEA], e intente nuevamente su REVERSION en Odoo.'
-                        view = self.env.ref('l10n_ec_invoice.message_box_form')
-                        # view_id = view and view.id or False
-                        context = dict(self._context or {})
-                        context['message'] = message
-                        return {'name': title,
-                                'type': 'ir.actions.act_window',
-                                'res_model': 'message_box',
-                                'view_mode': 'form',
-                                'view_type': 'form',
-                                'view_id': view.id,
-                                'target': 'new',
-                                'context': context,
-                                }
+                        # ------------------------------------------------------------------------------------------------------
+                        # SRI: CARGA EL ESQUEMA PARA EL TIPO DE DOCUMENTO ELECTRONICO Y
+                        # VALIDA EL ARCHIVO archivo_basico_fix_xml EN EL FORMATO XML
+                        # --------------------------------------------------------------
+                        # -------------------------------------------------
+                        # DEFINE inv_xml EN FUNCION DEL ESQUEMA ESPECIFICO
+                        # -------------------------------------------------
+                        inv_xml = {}
 
-                numero = numero + 1
-                estado = formulario.estado
+                        if formulario.tipo_documento_tributario == 'DOCUMENTO DE COMPRA':
+                            if numero == 1:
+                                inv_xml = DocumentXML(archivo_basico_fix_xml, 'purchase_clearance')
+                            else:
+                                inv_xml = DocumentXML(archivo_basico_fix_xml, 'withdrawing')
+                        if formulario.tipo_documento_tributario == 'FACTURA DE VENTA':
+                            inv_xml = DocumentXML(archivo_basico_fix_xml, 'out_invoice')
+                        if formulario.tipo_documento_tributario == 'NOTA DE CREDITO DE VENTA':
+                            inv_xml = DocumentXML(archivo_basico_fix_xml, 'out_refund')
+                        if formulario.tipo_documento_tributario == 'GUIA DE REMISION':
+                            inv_xml = DocumentXML(archivo_basico_fix_xml, 'delivery')
+
+                        # ---------------------------
+                        # SRI AUTORIZACION SOLICITUD
+                        # ---------------------------
+                        # --------------------------------
+                        # SOLICITA LA AUTORIZACION AL SRI
+                        # --------------------------------
+
+                        # noinspection PyProtectedMember
+                        url_recepcion, url_autorizacion = formulario.company_id._get_ws()
+
+                        autorizacion, mensaje_autorizacion = inv_xml.request_authorization(doc_electronico_no_autorizacion, url_autorizacion)
+
+                        if autorizacion is not False and mensaje_autorizacion is False:
+                            # --------------------------------------------------------------------------------
+                            # MESSAGE_BOX CODE: USAR SOLO PARA MENSAJES INFORMATIVOS QUE NO DETENGAN PROCESOS
+                            # --------------------------------------------------------------------------------
+                            title = "MENSAJE INFORMATIVO:"
+                            message = 'El comprobante electrónico ' + \
+                                      tipo_comprobante_descripcion + \
+                                      ' No ' + \
+                                      str(formulario.reference) + \
+                                      ', con Clave de Acceso ' + \
+                                      str(doc_electronico_no_autorizacion) + \
+                                      ', se  encuentra ACTIVO y VIGENTE en el SRI. ANULE este comprobante a través del ' + \
+                                      'portal de internet [SRI EN LINEA], e intente nuevamente su REVERSION en Odoo.'
+                            view = self.env.ref('l10n_ec_invoice.message_box_form')
+                            # view_id = view and view.id or False
+                            context = dict(self._context or {})
+                            context['message'] = message
+                            return {'name': title,
+                                    'type': 'ir.actions.act_window',
+                                    'res_model': 'message_box',
+                                    'view_mode': 'form',
+                                    'view_type': 'form',
+                                    'view_id': view.id,
+                                    'target': 'new',
+                                    'context': context,
+                                    }
+
+                    numero = numero + 1
+                    estado = formulario.estado
 
         if formulario.doc_electronico_tipo == 'LIQUIDACIÓN DE COMPRA':
             formulario.estado_lc = '04'
@@ -2820,9 +2850,9 @@ class AccountJournal(models.Model):
                 else:
                     nombre_prefijo = self.nombre
             if self.type == "general":
-                self.code = "GEN"
-                if not str.__contains__(self.nombre, "GENERAL"):
-                    nombre_prefijo = "GENERAL"
+                self.code = "DIA"
+                if not str.__contains__(self.nombre, "DIARIO"):
+                    nombre_prefijo = "DIARIO"
                 else:
                     nombre_prefijo = self.nombre
             self.nombre = nombre_prefijo
@@ -2866,7 +2896,7 @@ class AccountJournal(models.Model):
             if self.sequence_id:
                 sequence = self.env['ir.sequence'].search([('name', '=', self.sequence_id.name)])
                 vals = {
-                    'prefix': "VTA/" + self.establecimiento + "-" + self.punto_emision + "/%(range_y)s/"
+                    'prefix': "VTA/" + str(int(self.establecimiento)) + "-" + str(int(self.punto_emision)) + "/%(range_y)s/"
                 }
                 sequence.write(vals)
             # ---------------------------------------
@@ -2877,7 +2907,7 @@ class AccountJournal(models.Model):
                 self.refund_sequence_id.name = ref_seq_name
                 sequence = self.env['ir.sequence'].search([('name', '=', self.refund_sequence_id.name)])
                 vals = {
-                    'prefix': "NCV/" + self.establecimiento + "-" + self.punto_emision + "/%(range_y)s/"
+                    'prefix': "NCV/" + str(int(self.establecimiento)) + "-" + str(int(self.punto_emision)) + "/%(range_y)s/"
                 }
                 sequence.write(vals)
                 self.refund_sequence_id = sequence.id
@@ -2891,7 +2921,7 @@ class AccountJournal(models.Model):
                 vals = {
                     'name': self.establecimiento + "-" + self.punto_emision + "-SRI FACTURA Secuencia",
                     'implementation': 'standard',
-                    'prefix': "FV-" + self.establecimiento + "-" + self.punto_emision + "-",
+                    'prefix': "FV-" + str(int(self.establecimiento)) + "-" + str(int(self.punto_emision)) + "-",
                     'padding': 9,
                     'number_increment': 1,
                     'use_date_range': True,
@@ -2909,7 +2939,7 @@ class AccountJournal(models.Model):
                 vals = {
                     'name': self.establecimiento + "-" + self.punto_emision + "-SRI NOTA CREDITO Secuencia",
                     'implementation': 'standard',
-                    'prefix': "NC-" + self.establecimiento + "-" + self.punto_emision + "-",
+                    'prefix': "NC-" + str(int(self.establecimiento)) + "-" + str(int(self.punto_emision)) + "-",
                     'padding': 9,
                     'number_increment': 1,
                     'use_date_range': True,
@@ -2926,7 +2956,7 @@ class AccountJournal(models.Model):
                 vals = {
                     'name': self.establecimiento + "-" + self.punto_emision + "-SRI GUIA REMISION Secuencia",
                     'implementation': 'standard',
-                    'prefix': "GR-" + self.establecimiento + "-" + self.punto_emision + "-",
+                    'prefix': "GR-" + str(int(self.establecimiento)) + "-" + str(int(self.punto_emision)) + "-",
                     'padding': 9,
                     'number_increment': 1,
                     'use_date_range': True,
@@ -2944,7 +2974,7 @@ class AccountJournal(models.Model):
             if self.sequence_id:
                 sequence = self.env['ir.sequence'].search([('name', '=', self.sequence_id.name)])
                 vals = {
-                    'prefix': "COM/" + self.establecimiento + "-" + self.punto_emision + "/%(range_y)s/"
+                    'prefix': "COM/" + str(int(self.establecimiento)) + "-" + str(int(self.punto_emision)) + "/%(range_y)s/"
                 }
                 sequence.write(vals)
             # ---------------------------------------
@@ -2955,7 +2985,7 @@ class AccountJournal(models.Model):
                 self.refund_sequence_id.name = ref_seq_name
                 sequence = self.env['ir.sequence'].search([('name', '=', self.refund_sequence_id.name)])
                 vals = {
-                    'prefix': "NCC/" + self.establecimiento + "-" + self.punto_emision + "/%(range_y)s/"
+                    'prefix': "NCC/" + str(int(self.establecimiento)) + "-" + str(int(self.punto_emision)) + "/%(range_y)s/"
                 }
                 sequence.write(vals)
                 self.refund_sequence_id = sequence.id
@@ -2969,7 +2999,7 @@ class AccountJournal(models.Model):
                 vals = {
                     'name': self.establecimiento + "-" + self.punto_emision + "-SRI LIQUIDACION COMPRA Secuencia",
                     'implementation': 'standard',
-                    'prefix': "LC-" + self.establecimiento + "-" + self.punto_emision + "-",
+                    'prefix': "LC-" + str(int(self.establecimiento)) + "-" + str(int(self.punto_emision)) + "-",
                     'padding': 9,
                     'number_increment': 1,
                     'use_date_range': True,
@@ -2986,7 +3016,7 @@ class AccountJournal(models.Model):
                 vals = {
                     'name': self.establecimiento + "-" + self.punto_emision + "-SRI RETENCION Secuencia",
                     'implementation': 'standard',
-                    'prefix': "CR-" + self.establecimiento + "-" + self.punto_emision + "-",
+                    'prefix': "CR-" + str(int(self.establecimiento)) + "-" + str(int(self.punto_emision)) + "-",
                     'padding': 9,
                     'number_increment': 1,
                     'use_date_range': True,
@@ -3004,7 +3034,7 @@ class AccountJournal(models.Model):
             if self.sequence_id:
                 sequence = self.env['ir.sequence'].search([('name', '=', self.sequence_id.name)])
                 vals = {
-                    'prefix': "GEN/" + self.establecimiento + "-" + self.punto_emision + "/%(range_y)s/"
+                    'prefix': self.code + '/' + str(int(self.establecimiento)) + "-" + str(int(self.punto_emision)) + "/%(range_y)s/"
                 }
                 sequence.write(vals)
 
@@ -3038,35 +3068,35 @@ class AccountJournal(models.Model):
         if self.liquidacionCompra_sequence_id:
             sequence = self.env['ir.sequence'].search([('id', '=', self.liquidacionCompra_sequence_id.id)])
             vals = {
-                'prefix': "LC-" + self.establecimiento + "-" + self.punto_emision + "-"
+                'prefix': "LC-" + str(int(self.establecimiento)) + "-" + str(int(self.punto_emision)) + "-"
             }
             sequence.write(vals)
             self.liquidacionCompra_sequence_id = sequence.id
         if self.retencion_sequence_id:
             sequence = self.env['ir.sequence'].search([('id', '=', self.retencion_sequence_id.id)])
             vals = {
-                'prefix': "CR-" + self.establecimiento + "-" + self.punto_emision + "-"
+                'prefix': "CR-" + str(int(self.establecimiento)) + "-" + str(int(self.punto_emision)) + "-"
             }
             sequence.write(vals)
             self.retencion_sequence_id = sequence.id
         if self.factura_sequence_id:
             sequence = self.env['ir.sequence'].search([('id', '=', self.factura_sequence_id.id)])
             vals = {
-                'prefix': "FV-" + self.establecimiento + "-" + self.punto_emision + "-"
+                'prefix': "FV-" + str(int(self.establecimiento)) + "-" + str(int(self.punto_emision)) + "-"
             }
             sequence.write(vals)
             self.factura_sequence_id = sequence.id
         if self.notaCredito_sequence_id:
             sequence = self.env['ir.sequence'].search([('id', '=', self.notaCredito_sequence_id.id)])
             vals = {
-                'prefix': "NC-" + self.establecimiento + "-" + self.punto_emision + "-"
+                'prefix': "NC-" + str(int(self.establecimiento)) + "-" + str(int(self.punto_emision)) + "-"
             }
             sequence.write(vals)
             self.notaCredito_sequence_id = sequence.id
         if self.guia_sequence_id:
             sequence = self.env['ir.sequence'].search([('id', '=', self.guia_sequence_id.id)])
             vals = {
-                'prefix': "GR-" + self.establecimiento + "-" + self.punto_emision + "-"
+                'prefix': "GR-" + str(int(self.establecimiento)) + "-" + str(int(self.punto_emision)) + "-"
             }
             sequence.write(vals)
             self.guia_sequence_id = sequence.id

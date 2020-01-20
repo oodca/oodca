@@ -24,6 +24,19 @@
           <field name="bool_validar" string="SRI" readonly="1"/>
           <field name="tipo_documento_tributario" invisible="1"/>
         </xpath>
+        <xpath expr="//field[@name='state']" position="before">
+          <field name="iva_12" string="IVA 12%"/>
+          <field name="valor_total" string="Valor Total"/>
+        </xpath>
+        <xpath expr="//field[@name='amount_tax_signed']" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
+        <xpath expr="//field[@name='amount_total_signed']" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
+        <xpath expr="//field[@name='residual_signed']" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
       </field>
     </record>
 
@@ -158,6 +171,14 @@
           <attribute name="attrs">{}</attribute>
           <attribute name="invisible">1</attribute>
         </xpath>
+
+        <!-- INVISIBLE: ASSET_CATEGORY_ID DENTRO DEL INVOICE_LINE_IDS -->
+        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='invoice_line_ids']/tree[1]/field[@name='asset_category_id']" position="attributes">
+          <attribute name="attrs">{}</attribute>
+          <attribute name="invisible">1</attribute>
+        </xpath>
+
+
         <!-- VISIBLE: AMOUNT_TOTAL DENTRO DE RESUMEN DE FACTURA -->
         <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/group[1]/group[2]/field[@name='amount_total']" position="attributes">
           <attribute name="attrs">{}</attribute>
@@ -248,6 +269,7 @@
           <field name="ultimo_estado" string="Ultimo Estado" readonly="1" invisible="1" force_save="1"/>
           <field name="bool_onOff_no_anulacion" string="On/Off No Anulación" readonly="1" invisible="1" force_save="1"/>
           <field name="bool_onOff_no_anulacion" string="On/Off No Anulación" readonly="1" invisible="1" force_save="1"/>
+          <field name="bool_activo_no_corriente" readonly="0" invisible="0" force_save="1"/>
         </xpath>
         <!-- BOTTON DE VALIDACION TRIBUTARIA -->
         <xpath expr="//header" position="inside">

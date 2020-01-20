@@ -49,10 +49,9 @@ class AccountInvoice(models.Model):
         # ruta_archivo_xml = tempfile.gettempdir() + '/'
         ruta_archivo_xml = self.company_id.company_ruta_documentos
 
-
         journal = self.journal_id
         sequence = journal.retencion_sequence_id
-        prefix = sequence.prefix
+
         retencion_sequence_number_next = journal.retencion_sequence_number_next
 
         establecimiento = journal.establecimiento
@@ -60,6 +59,7 @@ class AccountInvoice(models.Model):
         numero_secuencial = "0" * (9 - len(str(retencion_sequence_number_next))) + str(retencion_sequence_number_next)
 
         referencia = establecimiento + "-" + punto_emision + "-" + numero_secuencial
+        prefix = 'CR-' + referencia
         # ------------------------------------------------------------------------------------
         # FECHAS: La fecha de la retención debe ser la fecha de emisión del documento de compra
         # Si fue determinada por el usuario se mantiene
@@ -69,7 +69,7 @@ class AccountInvoice(models.Model):
         else:
             fecha_documento_electronico = self.doc_electronico_fecha
 
-        doc_electronico_xml = prefix + str(numero_secuencial) + ".xml"
+        doc_electronico_xml = prefix + ".xml"
         nombre_archivo = ruta_archivo_xml + doc_electronico_xml
         dirEstab = self.env['res.partner'].search(
             [('name', '=', establecimiento), ('parent_id', '=', self.company_id.id)]).street
