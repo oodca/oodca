@@ -33,6 +33,7 @@ Desarrollado por: **José Ernesto Enríquez Jurado**
 """,
     'depends': [
         'account',
+        'account_asset',
         'base_iban',
     ],
     'data': [
