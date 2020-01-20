@@ -3,7 +3,7 @@
     <data>
         <report
             id="account_move_report"
-            string="Asiento Contable"
+            string="Diario Contable"
             model="account.move"
             report_type="qweb-pdf"
             name="l10n_ec_comprobantes.report_move"
