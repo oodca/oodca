@@ -411,6 +411,7 @@ class AccountInvoice(models.Model):
                         message = 'XADES: ' + archivo_firmado_xml.split("\n")[0] + " / " + archivo_firmado_xml.split("\n")[1]
                         log_msg = str(message).replace("'", "").upper()
                         logging.info(log_msg)
+                        self.history_log(log_msg)
 
                         raise UserError(str(log_msg))
 
@@ -887,8 +888,8 @@ class AccountInvoice(models.Model):
                     self.history_log(log_msg)
 
                     inv_xml, archivo_firmado_xml = self.firma_electronica("COMPROBANTE DE RETENCION")
-                    # self.validar_comprobante_sri(inv_xml, archivo_firmado_xml, "COMPROBANTE DE RETENCION")
-                    # self.autorizar_comprobante_sri(inv_xml, "COMPROBANTE DE RETENCION")
+                    self.validar_comprobante_sri(inv_xml, archivo_firmado_xml, "COMPROBANTE DE RETENCION")
+                    self.autorizar_comprobante_sri(inv_xml, "COMPROBANTE DE RETENCION")
 
                     # ---------------------------------------------
                     # SE REDEFINEN LOS ESTADOS. PREVALECE EL MENOR
@@ -997,8 +998,8 @@ class AccountInvoice(models.Model):
                     self.history_log(log_msg)
 
                     inv_xml, archivo_firmado_xml = self.firma_electronica(self.tipo_comprobante_descripcion)
-                    # self.validar_comprobante_sri(inv_xml, archivo_firmado_xml, self.tipo_comprobante_descripcion)
-                    # self.autorizar_comprobante_sri(inv_xml, self.tipo_comprobante_descripcion)
+                    self.validar_comprobante_sri(inv_xml, archivo_firmado_xml, self.tipo_comprobante_descripcion)
+                    self.autorizar_comprobante_sri(inv_xml, self.tipo_comprobante_descripcion)
                     # -------------------------------
                     # REFRESCA LA PANTALLA Y RETORNA
                     # -------------------------------
