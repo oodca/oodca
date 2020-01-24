@@ -879,8 +879,8 @@ class AccountInvoice(models.Model):
                     self.history_log(log_msg)
 
                     inv_xml, archivo_firmado_xml = self.firma_electronica(self.tipo_comprobante_descripcion)
-                    self.validar_comprobante_sri(inv_xml, archivo_firmado_xml, self.tipo_comprobante_descripcion)
-                    self.autorizar_comprobante_sri(inv_xml, self.tipo_comprobante_descripcion)
+                    # self.validar_comprobante_sri(inv_xml, archivo_firmado_xml, self.tipo_comprobante_descripcion)
+                    # self.autorizar_comprobante_sri(inv_xml, self.tipo_comprobante_descripcion)
 
                     log_msg = '–––––––––––––––––––– COMPROBANTE ELECTRONICO –––––––––––––––––––––'
                     logging.info(log_msg)
